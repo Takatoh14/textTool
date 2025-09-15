@@ -1,0 +1,15 @@
+# 開発用：Vite devサーバをコンテナで起動
+FROM node:20-alpine
+
+WORKDIR /app
+
+# 依存関係だけ先に入れてキャッシュを効かせる
+COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+RUN npm ci || npm i
+
+# ソースはcompose側でマウント
+EXPOSE 5173
+
+# 開発時はルート配信でOK
+ENV VITE_BASE=/
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
