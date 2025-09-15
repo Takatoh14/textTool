@@ -79,6 +79,28 @@ const cases: Case[] = [
     },
     expect: 'foo bar',
   },
+  {
+    title: '正規表現モードで \\. をタブに置換',
+    opts: {
+      input: 'a.b.c',
+      pattern: '\\.',
+      replacement: '\t',
+      regex: true,
+      caseSensitive: true,
+    },
+    expect: 'a\tb\tc',
+  },
+  {
+    title: '正規表現モードで改行に置換',
+    opts: {
+      input: 'a,b,c',
+      pattern: ',',
+      replacement: '\n',
+      regex: true,
+      caseSensitive: true,
+    },
+    expect: 'a\nb\nc',
+  },
 ];
 
 describe('replaceText', () => {
