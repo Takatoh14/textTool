@@ -27,3 +27,6 @@ React + TypeScript で作成したテキスト操作ツールです。
 
 ## 📜 License
 MIT License
+
+## 🧪 テスト結果
+![replaceText のテスト結果](./docs/images/replaceText-result-success.png)
