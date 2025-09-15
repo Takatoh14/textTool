@@ -4,9 +4,9 @@ import { decodeEscapes } from '../../utils/decodeEscapes';
 import './textTool.scss';
 
 export default function TextTool() {
-  const [input, setInput] = useState('Hello World. hello world.');
-  const [pattern, setPattern] = useState('hello');
-  const [replacement, setReplacement] = useState('\\t'); // 例: \t
+  const [input, setInput] = useState('');
+  const [pattern, setPattern] = useState('');
+  const [replacement, setReplacement] = useState(''); // 例: \t
   const [regex, setRegex] = useState(false);
   const [caseSensitive, setCaseSensitive] = useState(false);
 
@@ -29,7 +29,7 @@ export default function TextTool() {
 
   return (
     <div className="tt-container">
-      <h1 className="tt-title">React Text Tool</h1>
+      <h1 className="tt-title">データ変換ツール</h1>
 
       {/* 入力 */}
       <section className="tt-section">
@@ -66,7 +66,7 @@ export default function TextTool() {
               type="text"
               value={replacement}
               onChange={e => setReplacement(e.target.value)}
-              placeholder="例) \\t や \\n（正規表現モード時のみ解釈）"
+              placeholder="例) \\t や \\n（正規表現モード時のみ有効）"
             />
           </label>
 
