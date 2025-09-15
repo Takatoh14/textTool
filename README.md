@@ -32,6 +32,7 @@ React + TypeScript で作成したテキスト操作ツールです。
 replaceText のテスト結果
 ![replaceText のテスト結果](./docs/images/replaceText-result-success.png)
 ![replaceText のテスト結果](./docs/images/replaceText-escape-success.png)
+![jsonOps のテスト結果](./docs/images/jsonOps-result-success.png)
 
 ---
 
