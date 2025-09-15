@@ -1,0 +1,89 @@
+/* ===== Minimal Reset (自作) ===== */
+
+/* 余白リセット＋ボックスサイジング統一 */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 基本の文字設定 */
+html {
+  /* スクロールの体験を安定化 */
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ベース */
+body {
+  min-height: 100dvh; /* モバイルのアドレスバー対策 */
+  line-height: 1.5;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue',
+    Arial, 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+  background-color: #0f0f11;
+  color: #e9eaee;
+  text-rendering: optimizeLegibility;
+}
+
+/* メディアのデフォルトをブロック化 */
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  display: block;
+  max-width: 100%;
+}
+
+/* 画像の縮小に備える */
+img {
+  height: auto;
+}
+
+/* 見出しのデフォルトを少し整える（余白はコンポーネント側で） */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+}
+
+/* リストの記号をリセット（必要な場面で付与） */
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+}
+
+/* フォーム系のフォント継承 */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+}
+
+/* ボタンのデフォルト装飾を最小化 */
+button {
+  border: none;
+  cursor: pointer;
+}
+
+/* リンクの下線はユースケースで付与 */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* テーブル初期化（必要に応じて上書き） */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}

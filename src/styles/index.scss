@@ -1,0 +1,11 @@
+@use './reset';
+@use './variables';
+@use './mixins';
+
+body {
+  background-color: #222;
+  color: #00ffcc;
+  font-family: sans-serif;
+  text-align: center;
+  margin-top: 50px;
+}

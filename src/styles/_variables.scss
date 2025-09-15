@@ -1,0 +1,29 @@
+/* ===== Design Tokens ===== */
+
+/* 色 */
+$color-bg: #0f0f11;
+$color-surface: #121418;
+$color-fg: #e9eaee;
+$color-muted: #9aa3b2;
+$color-accent: #6ea8fe;
+
+/* 余白 */
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-6: 24px;
+
+/* フォントサイズ */
+$font-sm: 14px;
+$font-md: 16px;
+$font-lg: 20px;
+$font-xl: 28px;
+
+/* ブレークポイント */
+$bp-sm: 640px;
+$bp-md: 960px;
+$bp-lg: 1200px;
+
+/* 枠線・角丸 */
+$radius: 12px;
+$border: 1px solid rgba(255, 255, 255, 0.08);
