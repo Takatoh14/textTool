@@ -100,3 +100,46 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 入力エリアを左右2カラム */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 720px) {
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 差分の色付けはそのまま流用 */
+.diff-add {
+  background: rgba(34, 197, 94, 0.25);
+}
+.diff-del {
+  background: rgba(239, 68, 68, 0.3);
+  text-decoration: line-through;
+}
+
+/* 横並びの結果 */
+.diff-columns {
+  display: flex;
+  gap: 16px;
+}
+.diff-pane {
+  flex: 1 1 0;
+}
+.diff-pane__title {
+  opacity: 0.8;
+  margin-bottom: 6px;
+}
+.diff-pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #111;
+  padding: 12px;
+  border-radius: 8px;
+  min-height: 7em;
+}
