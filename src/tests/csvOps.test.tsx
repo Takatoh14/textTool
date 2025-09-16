@@ -1,28 +1,8 @@
+import { EOLS, csvToJson, jsonToCsv } from '../utils/csvOps';
 // src/tests/csvOps.test.ts
 import { describe, expect, it } from 'vitest';
 
-import { jsonToCsv } from '../utils/csvOps';
-
 describe('jsonToCsv', () => {
-  // テスト内ユーティリティ：ネストしたオブジェクトを "a.b.c" のキーにフラット化
-  type Row = Record<string, unknown>;
-
-  function flattenRow(obj: Row, parent = '', out: Row = {}): Row {
-    for (const [k, v] of Object.entries(obj)) {
-      const key = parent ? `${parent}.${k}` : k;
-      if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
-        flattenRow(v as Row, key, out);
-      } else {
-        out[key] = v;
-      }
-    }
-    return out;
-  }
-
-  function flattenRows(rows: Row[]): Row[] {
-    return rows.map(r => flattenRow(r));
-  }
-
   const rows = [
     { name: 'Alice', age: 20, city: 'To"kyo' }, // ダブルクォート含む
     { name: 'Bob', age: 30, note: 'a,b' }, // カンマ含む
@@ -30,12 +10,9 @@ describe('jsonToCsv', () => {
 
   it('カンマ区切りでCSVを出力（ヘッダあり）', () => {
     const csv = jsonToCsv(rows, { delimiter: ',', header: true });
-    // 先頭行にヘッダがある
-    expect(csv.split('\n')[0]).toContain('name');
-    // ダブルクォートは二重化される
-    expect(csv).toContain('"To""kyo"');
-    // カンマを含むセルはクォートされる
-    expect(csv).toContain('"a,b"');
+    expect(csv.split('\n')[0]).toContain('name'); // 先頭行にヘッダ
+    expect(csv).toContain('"To""kyo"'); // ダブルクォートは二重化
+    expect(csv).toContain('"a,b"'); // 区切りを含むセルはクォート
   });
 
   it('TSV（タブ区切り）を出力', () => {
@@ -51,7 +28,7 @@ describe('jsonToCsv', () => {
   });
 
   it('改行コード CRLF', () => {
-    const out = jsonToCsv(rows, { delimiter: ',', newline: '\r\n' });
+    const out = jsonToCsv(rows, { delimiter: ',', newline: EOLS.crlf });
     expect(out.includes('\r\n')).toBe(true);
   });
 
@@ -70,17 +47,48 @@ describe('jsonToCsv', () => {
     const out = jsonToCsv('', { delimiter: ',' });
     expect(out).toBe('');
   });
+});
 
-  it('ネストはドット記法でフラット化', () => {
-    const nested = [{ u: { id: 1, name: 'x' } }];
+describe('csvToJson', () => {
+  it('カンマ区切り（ヘッダあり）', () => {
+    const csv = `name,age,note\n"Alice",20,"a,b"`;
+    const json = csvToJson(csv, { delimiter: ',', header: true });
+    expect(json[0].name).toBe('Alice');
+    expect(json[0].note).toBe('a,b');
+  });
 
-    // ← ここでフラット化してから jsonToCsv に渡す
-    const csv = jsonToCsv(flattenRows(nested), {
-      delimiter: ',',
-      header: true,
-    });
+  it('TSV（ヘッダあり）', () => {
+    const tsv = `name\tage\nBob\t30`;
+    const json = csvToJson(tsv, { delimiter: '\t', header: true });
+    expect(json[0].name).toBe('Bob');
+    expect(json[0].age).toBe('30');
+  });
 
-    expect(csv.split('\n')[0]).toContain('u.id'); // ヘッダ
-    expect(csv).toContain('1');
+  it('カスタム区切り（"::"）・ヘッダ無し', () => {
+    const text = `Alice::20::X\nBob::30::Y`;
+    const json = csvToJson(text, { delimiter: '::', header: false });
+    // 自動ヘッダ col1..colN
+    expect(json[0].col1).toBe('Alice');
+    expect(json[0].col2).toBe('20');
+    expect(json[0].col3).toBe('X');
+  });
+
+  it('CRLF 改行をパース', () => {
+    const csv = `a,b\r\n1,2\r\n3,4`;
+    const json = csvToJson(csv, { delimiter: ',', header: true });
+    expect(json.length).toBe(2);
+    expect(json[0].a).toBe('1');
+  });
+
+  it('空文字は空配列', () => {
+    const json = csvToJson('', { delimiter: ',', header: true });
+    expect(json.length).toBe(0);
+  });
+
+  it('引用とエスケープ（"" -> "）', () => {
+    const csv = `name,note\n"Al""ice","say ""hello"""`;
+    const json = csvToJson(csv, { delimiter: ',', header: true });
+    expect(json[0].name).toBe('Al"ice');
+    expect(json[0].note).toBe('say "hello"');
   });
 });
