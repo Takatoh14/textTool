@@ -1,8 +1,9 @@
 // src/App.tsx
 import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
+import CsvToJsonTool from './features/csvToJson/CsvToJsonTool'; // ← 追加
 import CsvTool from './features/csvTool/CsvTool';
-import JsonTool from './components//jsonTool/JsonTool';
+import JsonTool from './components/jsonTool/JsonTool';
 import TextTool from './features/textTool/TextTool';
 
 export default function App() {
@@ -11,7 +12,6 @@ export default function App() {
       <div style={{ padding: '1rem', fontFamily: 'system-ui, sans-serif' }}>
         <h1>テキスト操作ツール集</h1>
 
-        {/* ナビゲーション */}
         <nav style={{ marginBottom: '1rem' }}>
           <Link to="/" style={{ marginRight: 12 }}>
             テキスト置換
@@ -19,14 +19,18 @@ export default function App() {
           <Link to="/json" style={{ marginRight: 12 }}>
             JSON整形
           </Link>
-          <Link to="/csv">JSON→CSV/TSV</Link>
+          <Link to="/csv" style={{ marginRight: 12 }}>
+            JSON→CSV/TSV
+          </Link>
+          <Link to="/csv-to-json">CSV/TSV→JSON</Link> {/* ← 追加 */}
         </nav>
 
-        {/* ルーティング */}
         <Routes>
           <Route path="/" element={<TextTool />} />
           <Route path="/json" element={<JsonTool />} />
           <Route path="/csv" element={<CsvTool />} />
+          <Route path="/csv-to-json" element={<CsvToJsonTool />} />{' '}
+          {/* ← 追加 */}
         </Routes>
       </div>
     </Router>

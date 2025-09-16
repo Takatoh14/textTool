@@ -7,30 +7,50 @@ export type Matrix = unknown[][];
 /** どちらの JSON でも受け付けられる型 */
 export type JsonData = RowObject[] | Matrix;
 
-/** 値を CSV 用の文字列に変換（必要に応じてクォート） */
-function cellToString(v: unknown): string {
+/** 改行コードの候補 */
+export const EOLS = {
+  lf: '\n',
+  crlf: '\r\n',
+  cr: '\r',
+} as const;
+
+export type EolKey = keyof typeof EOLS;
+
+/* -------------------------------------------------------------------------- */
+/*                               生成（JSON→CSV）                              */
+/* -------------------------------------------------------------------------- */
+
+/** 区切り文字や改行や " を含む／前後が空白 の場合は引用が必要 */
+function needsQuote(s: string, sep: string): boolean {
+  return (
+    s.includes('"') ||
+    s.includes('\r') ||
+    s.includes('\n') ||
+    s.includes(sep) ||
+    /^\s|\s$/.test(s)
+  );
+}
+
+/** " を "" にエスケープして "..." で包む */
+function quote(s: string): string {
+  return `"${s.replace(/"/g, '""')}"`;
+}
+
+/** 値を CSV 用の文字列に変換（必要に応じてクォート／sep を考慮） */
+function cellToString(v: unknown, sep: string): string {
   if (v === null || v === undefined) return '';
-  if (typeof v === 'string') return quoteIfNeeded(v);
+  if (typeof v === 'string') return needsQuote(v, sep) ? quote(v) : v;
   if (typeof v === 'number' || typeof v === 'bigint') return String(v);
   if (typeof v === 'boolean') return v ? 'true' : 'false';
   // オブジェクトや配列は JSON にして出力
-  return quoteIfNeeded(JSON.stringify(v));
-}
-
-function quoteIfNeeded(s: string): string {
-  // 罫線・改行・" が含まれる場合や前後空白は "..." にして " を二重化
-  if (/[",\r\n]/.test(s) || /^\s|\s$/.test(s)) {
-    return `"${s.replace(/"/g, '""')}"`;
-  }
-  return s;
+  const s = JSON.stringify(v);
+  return needsQuote(s, sep) ? quote(s) : s;
 }
 
 /** RowObject[] からヘッダ（列名のユニーク順序）を作る */
 function collectHeaders(rows: RowObject[]): string[] {
   const set = new Set<string>();
-  for (const r of rows) {
-    for (const k of Object.keys(r)) set.add(k);
-  }
+  for (const r of rows) for (const k of Object.keys(r)) set.add(k);
   return [...set];
 }
 
@@ -52,7 +72,9 @@ export function toDelimited({
 
   // 行列（Matrix）
   if (Array.isArray(data[0])) {
-    const rows = (data as Matrix).map(row => row.map(cellToString).join(sep));
+    const rows = (data as Matrix).map(row =>
+      row.map(v => cellToString(v, sep)).join(sep)
+    );
     return rows.join(eol);
   }
 
@@ -62,25 +84,16 @@ export function toDelimited({
   const out: string[] = [];
 
   if (includeHeader) {
-    out.push(headers.map(h => quoteIfNeeded(h)).join(sep));
+    out.push(headers.map(h => (needsQuote(h, sep) ? quote(h) : h)).join(sep));
   }
 
   for (const r of rows) {
-    const line = headers.map(h => cellToString((r as RowObject)[h]));
+    const line = headers.map(h => cellToString((r as RowObject)[h], sep));
     out.push(line.join(sep));
   }
 
   return out.join(eol);
 }
-
-/** 改行コードの候補 */
-export const EOLS = {
-  lf: '\n',
-  crlf: '\r\n',
-  cr: '\r',
-} as const;
-
-export type EolKey = keyof typeof EOLS;
 
 /** jsonToCsv のオプション */
 export interface JsonToCsvOptions {
@@ -125,7 +138,6 @@ export function jsonToCsv(
   options: JsonToCsvOptions = {}
 ): string {
   const data = parseJsonLoose(input);
-
   if (!Array.isArray(data) || data.length === 0) return '';
 
   const sep = options.delimiter ?? ',';
@@ -144,5 +156,154 @@ export function jsonToCsv(
   });
 }
 
-/** 便利のため default でも出せるようにしておく（任意） */
+/** 便利のため default でも出せるようにしておく */
 export default jsonToCsv;
+
+/* -------------------------------------------------------------------------- */
+/*                               解析（CSV→JSON）                              */
+/* -------------------------------------------------------------------------- */
+
+export interface ParseOptions {
+  delimiter: string; // 区切り文字（例: ',', '\t', ';', '|', '::' など）
+  header: boolean; // 先頭行をヘッダとして扱うか
+  newline?: string; // 改行コード強制指定（指定なしは自動: CRLF/LF/CR どれでもOK）
+}
+
+/** 行配列（Matrix）をパース: RFC4180 準拠の "..." と "" のエスケープに対応 */
+function parseRows(
+  input: string,
+  delimiter: string,
+  newline?: string
+): string[][] {
+  if (!input.trim()) return [];
+
+  // 改行の検出/統一
+  const nl =
+    newline ??
+    (input.includes('\r\n') ? '\r\n' : input.includes('\r') ? '\r' : '\n');
+
+  const rows: string[][] = [];
+  let cur: string[] = [];
+  let cell = '';
+  let i = 0;
+  const DL = delimiter.length;
+
+  // 先頭のBOM対策
+  if (input.charCodeAt(0) === 0xfeff) {
+    input = input.slice(1);
+  }
+
+  while (i < input.length) {
+    const ch = input[i];
+
+    if (ch === '"') {
+      // quoted field
+      i++; // skip first quote
+      let inQuotes = true;
+      while (inQuotes && i < input.length) {
+        const c = input[i];
+        if (c === '"') {
+          const next = input[i + 1];
+          if (next === '"') {
+            // "" -> "
+            cell += '"';
+            i += 2;
+          } else {
+            // close quote
+            i++;
+            inQuotes = false;
+          }
+        } else {
+          cell += c;
+          i++;
+        }
+      }
+      // 引用終了後は、delimiter / 改行 / EOF を許可
+      if (i < input.length) {
+        if (input.startsWith(delimiter, i)) {
+          cur.push(cell);
+          cell = '';
+          i += DL;
+          continue;
+        }
+        if (input.startsWith(nl, i)) {
+          cur.push(cell);
+          rows.push(cur);
+          cur = [];
+          cell = '';
+          i += nl.length;
+          continue;
+        }
+      }
+      // その他（行末など）：そのまま継続
+      continue;
+    }
+
+    // 非引用フィールド
+    if (input.startsWith(delimiter, i)) {
+      cur.push(cell);
+      cell = '';
+      i += DL;
+      continue;
+    }
+    if (input.startsWith(nl, i)) {
+      cur.push(cell);
+      rows.push(cur);
+      cur = [];
+      cell = '';
+      i += nl.length;
+      continue;
+    }
+
+    cell += ch;
+    i++;
+  }
+
+  // 最後のセル/行
+  if (cell.length > 0 || cur.length > 0) {
+    cur.push(cell);
+  }
+  if (cur.length > 0) rows.push(cur);
+
+  return rows;
+}
+
+/** rows(string[][]) → オブジェクト配列へ（ヘッダ有無で分岐） */
+function rowsToObjects(
+  rows: string[][],
+  useHeader: boolean
+): Record<string, string>[] {
+  if (rows.length === 0) return [];
+  if (!useHeader) {
+    // col1..colN を自動付与
+    const maxCols = rows.reduce((m, r) => Math.max(m, r.length), 0);
+    const headers = Array.from({ length: maxCols }, (_, i) => `col${i + 1}`);
+    return rows.map(r => {
+      const obj: Record<string, string> = {};
+      headers.forEach((h, idx) => {
+        obj[h] = r[idx] ?? '';
+      });
+      return obj;
+    });
+  }
+
+  // 先頭行をヘッダとする
+  const [head, ...body] = rows;
+  return body.map(r => {
+    const obj: Record<string, string> = {};
+    head.forEach((h, idx) => {
+      obj[h] = r[idx] ?? '';
+    });
+    return obj;
+  });
+}
+
+/** CSV/TSV 文字列 → JSON（オブジェクト配列） */
+export function csvToJson(
+  input: string,
+  opts: ParseOptions
+): Record<string, string>[] {
+  if (!input.trim()) return [];
+  const rows = parseRows(input, opts.delimiter, opts.newline);
+  return rowsToObjects(rows, opts.header);
+}
