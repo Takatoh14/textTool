@@ -1,0 +1,87 @@
+// ================================
+// _variables.scss
+// プロジェクト全体で使用する変数（デザイントークン）
+// ================================
+
+// --------------------------------
+// 🎨 カラーパレット
+// --------------------------------
+$color-primary: #6c5ce7; // メインカラー
+$color-primary-600: #5a4fd4; // 濃いめのメインカラー
+$color-secondary: #00b894; // サブカラー
+$color-accent: #fdcb6e; // アクセント
+$color-danger: #e17055; // 警告・エラー
+$color-surface: #ffffff; // サーフェス（カード背景など）
+$color-bg: #f7f7fb; // ページ背景
+$color-text: #1c1e21; // 文字色
+$color-text-muted: #6b7280; // サブ文字色
+
+// --------------------------------
+// 📏 スペーシング（8pxベース）
+// --------------------------------
+$space-0: 0;
+$space-1: 0.4rem; // 4px
+$space-2: 0.8rem; // 8px
+$space-3: 1.2rem; // 12px
+$space-4: 1.6rem; // 16px
+$space-5: 2.4rem; // 24px
+$space-6: 3.2rem; // 32px
+
+// --------------------------------
+// 🔤 タイポグラフィ
+// --------------------------------
+$font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+  'Noto Sans JP', 'Hiragino Kaku Gothic ProN', Meiryo, Arial, sans-serif;
+$font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+  'Liberation Mono', monospace;
+
+// フォントサイズ（1rem = 10px 基準）
+$fs-12: 1.2rem; // 12px
+$fs-14: 1.4rem; // 14px
+$fs-16: 1.6rem; // 16px
+$fs-18: 1.8rem; // 18px
+$fs-24: 2.4rem; // 24px
+$fs-32: 3.2rem; // 32px
+
+// --------------------------------
+// 📱 ブレークポイント
+// --------------------------------
+$bp-sm: 480px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1280px;
+
+// --------------------------------
+// 🔝 Z-index（レイヤー管理）
+// --------------------------------
+$z-header: 1000;
+$z-overlay: 1100;
+$z-modal: 1200;
+$z-toast: 1300;
+
+// --------------------------------
+// コンテナの共通設定
+// --------------------------------
+$container-max: 1200px;
+$container-pad: 1.6rem;
+
+// --------------------------------
+// :root にCSS変数としても出力（必要なら）
+// --------------------------------
+:root {
+  --color-primary: #{$color-primary};
+  --color-secondary: #{$color-secondary};
+  --color-accent: #{$color-accent};
+  --color-danger: #{$color-danger};
+  --color-surface: #{$color-surface};
+  --color-bg: #{$color-bg};
+  --color-text: #{$color-text};
+  --color-text-muted: #{$color-text-muted};
+
+  --fs-12: #{$fs-12};
+  --fs-14: #{$fs-14};
+  --fs-16: #{$fs-16};
+  --fs-18: #{$fs-18};
+  --fs-24: #{$fs-24};
+  --fs-32: #{$fs-32};
+}

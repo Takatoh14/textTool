@@ -1,0 +1,109 @@
+// ================================
+// _reset.scss
+// ブラウザデフォルトスタイルのリセット
+// modern-css-reset + α
+// ================================
+
+/* すべての要素に box-sizing を適用 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* デフォルトのマージンを削除 */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* スクロールバーの幅を考慮（iOS Safari 対策） */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* リストスタイルをリセット */
+ul,
+ol {
+  list-style: none;
+}
+
+/* デフォルトのリンクスタイルをリセット */
+a {
+  color: inherit;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+/* 画像の最大幅を親に合わせる */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ボタン・入力系のリセット */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  appearance: none;
+}
+
+/* ボタンのカーソル */
+button {
+  cursor: pointer;
+}
+
+/* 表のセル間余白をなくす */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* 見出しを通常の文字サイズにリセット */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* strong や b の初期スタイルを調整 */
+strong {
+  font-weight: bold;
+}
+
+/* i, em をイタリックに統一 */
+i,
+em {
+  font-style: italic;
+}
+
+/* 引用符をデフォルト非表示に */
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote::before,
+blockquote::after,
+q::before,
+q::after {
+  content: '';
+  content: none;
+}

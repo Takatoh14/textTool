@@ -1,0 +1,198 @@
+// ================================
+// _mixins.scss
+// 便利ミックスイン集
+// - 依存: _variables.scss（$bp-*, 余白・色など）
+// - まずは @import でシンプル運用
+// ================================
+@use 'sass:math';
+@import './variables';
+
+// --------------------------------
+// 📱 メディアクエリ（最小幅 / 最大幅）
+// 例）@include mq($bp-md) { ... } / @include mq-down($bp-md) { ... }
+// --------------------------------
+@mixin mq($min-width) {
+  @media (min-width: $min-width) {
+    @content;
+  }
+}
+
+@mixin mq-down($max-width) {
+  @media (max-width: $max-width) {
+    @content;
+  }
+}
+
+// よく使うショートカット（デフォ値に $bp-* を使用）
+@mixin sm {
+  @include mq($bp-sm) {
+    @content;
+  }
+}
+@mixin md {
+  @include mq($bp-md) {
+    @content;
+  }
+}
+@mixin lg {
+  @include mq($bp-lg) {
+    @content;
+  }
+}
+@mixin xl {
+  @include mq($bp-xl) {
+    @content;
+  }
+}
+
+// --------------------------------
+/* 📦 コンテナ中央寄せ
+   例）.wrap { @include container(); } / @include container(1200px, 2rem); */
+// --------------------------------
+@mixin container($max: $container-max, $pad: $container-pad) {
+  width: min(100% - ($pad * 2), $max);
+  margin-inline: auto;
+}
+
+// --------------------------------
+// 🧮 流体タイポ / 流体スペース（clamp）
+// 例）@include fluid-type(1.4rem, 2vw + 1rem, 2.4rem);
+// 例）@include fluid-space(margin-top, 0.8rem, 2vw, 2.4rem);
+// --------------------------------
+@mixin fluid-type($min, $preferred, $max) {
+  font-size: clamp($min, $preferred, $max);
+}
+
+@mixin fluid-space($prop, $min, $preferred, $max) {
+  #{$prop}: clamp($min, $preferred, $max);
+}
+
+// --------------------------------
+// 🔲 アスペクト比
+// 例）.thumb { @include aspect(16, 9); }
+// --------------------------------
+@mixin aspect($w, $h) {
+  aspect-ratio: math.div($w, $h);
+}
+
+// --------------------------------
+// 🎯 Flex レイアウト系
+// --------------------------------
+@mixin flex-center($gap: 0) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $gap;
+}
+
+@mixin flex-row($justify: flex-start, $align: stretch, $gap: 0) {
+  display: flex;
+  flex-direction: row;
+  justify-content: $justify;
+  align-items: $align;
+  gap: $gap;
+}
+
+@mixin flex-col($justify: flex-start, $align: stretch, $gap: 0) {
+  display: flex;
+  flex-direction: column;
+  justify-content: $justify;
+  align-items: $align;
+  gap: $gap;
+}
+
+// --------------------------------
+// 🔳 Grid ショートカット
+// --------------------------------
+@mixin grid($cols: 2, $gap: 1.6rem) {
+  display: grid;
+  grid-template-columns: repeat($cols, 1fr);
+  gap: $gap;
+}
+
+@mixin grid-auto($minCol: 220px, $gap: 1.6rem) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($minCol, 1fr));
+  gap: $gap;
+}
+
+// --------------------------------
+// ✂️ テキスト省略（1行 / 複数行）
+// --------------------------------
+@mixin ellipsis-1() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin ellipsis($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// --------------------------------
+// 👓 スクリーンリーダー専用テキスト
+// --------------------------------
+@mixin sr-only() {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// --------------------------------
+// ✨ フォーカスリング（アクセシビリティ）
+// --------------------------------
+@mixin focus-ring($offset: 2px) {
+  outline: 2px solid currentColor;
+  outline-offset: $offset;
+}
+
+// --------------------------------
+// 🧱 影（Elevation）
+// 例）@include elevation(2); // 0 ~ 4 を想定
+// --------------------------------
+@mixin elevation($level: 1) {
+  @if $level == 0 {
+    box-shadow: none;
+  } @else if $level == 1 {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  } @else if $level == 2 {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  } @else if $level == 3 {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  } @else {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+}
+
+// --------------------------------
+// 🖱️ スクロールバー（WebKit）
+// --------------------------------
+@mixin scrollbar($size: 8px) {
+  &::-webkit-scrollbar {
+    width: $size;
+    height: $size;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 9999px;
+  }
+}
+
+// --------------------------------
+// 🧩 トランジション
+// --------------------------------
+@mixin transition($prop: all, $dur: 0.2s, $timing: ease) {
+  transition: $prop $dur $timing;
+}
