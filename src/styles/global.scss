@@ -1,0 +1,108 @@
+// ================================
+// global.scss
+// プロジェクトのスタイル“入口”
+// - ここで全スタイルを一括読み込みします
+// - 以降は App.tsx / main.tsx から global.scss を1回 import するだけ
+// ================================
+
+// 1) 設計値（色・余白・フォント・BP）
+@import './variables';
+
+// 2) ミックスイン（メディアクエリ・レイアウト補助）
+@import './mixins';
+
+// 3) リセット（ブラウザ初期スタイルの差異吸収）
+@import './reset';
+
+// ================================
+// ここからプロジェクト共通ルール
+// ================================
+
+// rem を 10px ベースにする（1rem = 10px）
+html {
+  font-size: 62.5%;
+}
+
+// ベース
+body {
+  font-family: $font-sans; // 変数ファイルから参照
+  color: var(--color-text, #1c1e21); // CSS変数（未設定時は第2引数）
+  background: var(--color-bg, #fff);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: $fs-16;
+}
+
+// セレクション色（任意）
+::selection {
+  background: var(--color-primary, #6c5ce7);
+  color: #fff;
+}
+
+// リンク（リセット済み＋軽いホバー）
+a {
+  transition: opacity 0.2s ease;
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+// 画像・メディア（リセットで max-width:100% 済み）
+img,
+svg,
+video,
+canvas {
+  vertical-align: middle;
+}
+
+// 共通コンテナ（ユーティリティ）
+// - ページの横幅を中央寄せで制御したい時に使用
+// - $container-max / $container-pad は _variables.scss で管理
+.container {
+  @include container(); // = 1200px / 1.6rem（現状の既定値）
+}
+
+// 見出しの初期サイズ（必要に応じて調整）
+h1 {
+  font-size: $fs-32;
+}
+h2 {
+  font-size: $fs-24;
+}
+h3 {
+  font-size: $fs-18;
+}
+h4,
+h5,
+h6 {
+  font-size: $fs-16;
+}
+
+// アクセシビリティ：キーボード操作時のフォーカスを見やすく
+:focus-visible {
+  @include focus-ring(2px);
+}
+
+// スクリーンリーダー専用テキスト（ユーティリティ）
+.sr-only {
+  @include sr-only();
+}
+
+// 小さめのユーティリティ（必要に応じて拡張）
+.mt-16 {
+  margin-top: 1.6rem;
+}
+.mb-16 {
+  margin-bottom: 1.6rem;
+}
+.p-16 {
+  padding: 1.6rem;
+}
+
+// ブレークポイント例：768px以上で .container の内側余白を増やす
+@include md {
+  .container {
+    @include container($container-max, 2.4rem);
+  }
+}

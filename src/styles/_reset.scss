@@ -1,89 +1,109 @@
-/* ===== Minimal Reset (自作) ===== */
+// ================================
+// _reset.scss
+// ブラウザデフォルトスタイルのリセット
+// modern-css-reset + α
+// ================================
 
-/* 余白リセット＋ボックスサイジング統一 */
+/* すべての要素に box-sizing を適用 */
 *,
 *::before,
 *::after {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
-/* 基本の文字設定 */
+/* デフォルトのマージンを削除 */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* スクロールバーの幅を考慮（iOS Safari 対策） */
 html {
-  /* スクロールの体験を安定化 */
   -webkit-text-size-adjust: 100%;
 }
 
-/* ベース */
-body {
-  min-height: 100dvh; /* モバイルのアドレスバー対策 */
-  line-height: 1.5;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue',
-    Arial, 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
-  background-color: #0f0f11;
-  color: #e9eaee;
-  text-rendering: optimizeLegibility;
+/* リストスタイルをリセット */
+ul,
+ol {
+  list-style: none;
 }
 
-/* メディアのデフォルトをブロック化 */
+/* デフォルトのリンクスタイルをリセット */
+a {
+  color: inherit;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+/* 画像の最大幅を親に合わせる */
 img,
-svg,
+picture,
 video,
 canvas,
-audio,
-iframe,
-embed,
-object {
+svg {
   display: block;
   max-width: 100%;
-}
-
-/* 画像の縮小に備える */
-img {
   height: auto;
 }
 
-/* 見出しのデフォルトを少し整える（余白はコンポーネント側で） */
+/* ボタン・入力系のリセット */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  appearance: none;
+}
+
+/* ボタンのカーソル */
+button {
+  cursor: pointer;
+}
+
+/* 表のセル間余白をなくす */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* 見出しを通常の文字サイズにリセット */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-weight: 600;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
-/* リストの記号をリセット（必要な場面で付与） */
-ul[role='list'],
-ol[role='list'] {
-  list-style: none;
+/* strong や b の初期スタイルを調整 */
+strong {
+  font-weight: bold;
 }
 
-/* フォーム系のフォント継承 */
-input,
-button,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
-  background: transparent;
+/* i, em をイタリックに統一 */
+i,
+em {
+  font-style: italic;
 }
 
-/* ボタンのデフォルト装飾を最小化 */
-button {
-  border: none;
-  cursor: pointer;
+/* 引用符をデフォルト非表示に */
+blockquote,
+q {
+  quotes: none;
 }
 
-/* リンクの下線はユースケースで付与 */
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* テーブル初期化（必要に応じて上書き） */
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
+blockquote::before,
+blockquote::after,
+q::before,
+q::after {
+  content: '';
+  content: none;
 }
